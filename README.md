@@ -1,21 +1,34 @@
 # AHC010 - Loop Lines Solver
 
-ALGO ARTIS Programming Contest 2022（AtCoder Heuristic Contest 010）的 Python 解法与评测脚本。
+ALGO ARTIS Programming Contest 2022（AtCoder Heuristic Contest 010）「Loop Lines」的 Python 解法与评测脚本。
 
 ## 题目概述
 
-- N×N 的网格，每格放有一块瓷砖（共 8 种类型）
-- 每块瓷砖上有线路（弯曲线或直线），可以旋转 0/1/2/3 次（每次逆时针 90°）
-- 线路无分叉，每条线是路径（path）或环路（cycle）的一部分
-- 目标：通过选择每块瓷砖的旋转方式，最大化最长环路（cycle）的长度
+- 30×30 的网格，每格一块瓦片（编号 0~7）
+- 8 种瓦片类型：
+  - 0~3：含一条弯曲线（L 形角）
+  - 4~5：含两条弯曲线
+  - 6~7：含一条直线
+- 每块瓦片可逆时针旋转 0/1/2/3 次（每次 90°），旋转后编号变化规则：`[1,2,3,0,5,4,7,6]`
+- 目标：通过选择每格的旋转次数，**最大化最大两个环路（cycle）的长度之和**
 
-## 瓷砖类型
+## 输入格式
 
-| 编号 | 说明 |
-|------|------|
-| 0~3 | 一条弯曲线（L 形），旋转后连接不同方向角 |
-| 4, 5 | 两条弯曲线，可将两个不同环路合并 |
-| 6, 7 | 一条直线，连接对边 |
+```
+N
+[N 行，每行 N 个字符，各字符为瓦片编号 0~7]
+```
+
+- N=30（固定）
+- 最后一行为 N（即 `4675` 对应 N=30... 实际为 N 单独一行后跟 N 行瓦片数据）
+
+## 输出格式
+
+```
+[一行长度 N*N=900 的字符串]
+```
+
+- 第 `30*i+j` 个字符为格 (i,j) 的旋转次数 r_{i,j}（0~3）
 
 ## 环境要求
 
@@ -35,22 +48,16 @@ ALGO ARTIS Programming Contest 2022（AtCoder Heuristic Contest 010）的 Python
 **2. 安装 CairoSVG 系统依赖**
 
 ```bash
-# Linux / WSL
 sudo apt install libcairo2-dev libffi-dev
 ```
 
 **3. 安装 ALE-Bench Toolkit**
 
 ```bash
-# 克隆 ALE-Bench 仓库并安装
 git clone https://github.com/SakanaAI/ALE-Bench.git ~/ALE-Bench
 cd ~/ALE-Bench
-
-# 创建虚拟环境
 python3 -m venv ~/ale-bench-env
 source ~/ale-bench-env/bin/activate
-
-# 安装（含评测依赖）
 pip install ".[eval]"
 ```
 
@@ -58,49 +65,32 @@ pip install ".[eval]"
 
 ```bash
 cd ~/ALE-Bench
-
-# 构建所有评测镜像
 bash ./scripts/docker_build_all.sh $(id -u) $(id -g)
-
-# 或仅构建指定版本
-bash ./scripts/docker_build_202301.sh $(id -u) $(id -g)
 ```
 
 ## 使用方法
 
-### Linux / WSL（在终端内）
+### Linux / WSL
 
 ```bash
-# 激活环境
 source ~/ale-bench-env/bin/activate
-
 cd /path/to/ahc010-solver
-
-# 完整评测（full 版，50 个 case，8 workers）默认
 python3 eval.py
 ```
 
-### Windows（通过 CMD 或 PowerShell 直接调用 WSL）
-
-无需打开 WSL 终端，在 Windows 的 CMD / PowerShell / Terminal 中直接运行：
+### Windows（PowerShell 调用 WSL）
 
 ```powershell
-# 完整评测（full 版，50 个 case，8 workers）默认
 wsl -e bash -lc "source ~/ale-bench-env/bin/activate && cd /path/to/ahc010-solver && python3 eval.py"
 ```
-
-> **说明：**
-> - `wsl -e bash -lc` 会启动一个 WSL login shell 并执行引号内的命令
-> - 将 `/path/to/ahc010-solver` 替换为项目在 WSL 中的实际路径（例如 `/mnt/d/86134/Documents/GitHub/ahc010-solver`）
-> - 确保 WSL 中已安装 ale_bench 虚拟环境（见上方安装步骤）
 
 ## 解法说明
 
 贪心旋转 + 并查集合并：
 
-1. **端口建模**：每个格子有 4 个方向端口（上/右/下/左），相邻格子之间的对应端口通过并查集预先合并（物理连接）
-2. **逐格旋转选择**：对每块瓷砖枚举 4 种旋转，选择能将最多不同连通分量合并（即延伸/合并环路）的旋转方式
-3. **贪心应用**：按从左到右、从上到下的顺序处理，每次选最优旋转并立即更新并查集
+1. **端口建模**：每格 4 个方向端口（上/右/下/左），相邻格对应端口预先通过并查集合并（物理连通）
+2. **逐格旋转选择**：枚举 4 种旋转，选能将最多不同连通分量合并的方案
+3. **应用并立即更新**：选定旋转后立即合并对应端口，影响后续格子的决策
 
 ## 文件结构
 
