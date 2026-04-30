@@ -1,9 +1,10 @@
 """
 AHC010 评测脚本（边跑边打印）
 用法：
-  python eval.py              # full 版，50 个 case（默认）
-  python eval.py --lite       # lite 版，5 个 case
+  python eval.py              # full 版，50 个 case
   python eval.py --workers 4  # 并行 worker 数（默认 8）
+
+注意：ahc010 无 lite 版本，--lite 参数不可用。
 """
 
 import argparse
@@ -13,15 +14,12 @@ import ale_bench
 
 def main():
     parser = argparse.ArgumentParser(description="AHC010 Evaluator")
-    parser.add_argument("--lite", action="store_true", help="使用 lite 版本（默认 full）")
     parser.add_argument("--workers", type=int, default=8, help="并行 worker 数（默认 8）")
     args = parser.parse_args()
 
-    lite = args.lite
-    mode = "lite" if args.lite else "full"
-    total_cases = 5 if args.lite else 50
+    total_cases = 50
 
-    print(f"=== AHC010 Evaluation ({mode}) ===")
+    print(f"=== AHC010 Evaluation (full) ===")
     print(f"Workers: {args.workers}  Cases: {total_cases}\n")
 
     with open("solution.py", "r", encoding="utf-8") as f:
@@ -30,7 +28,7 @@ def main():
     print("Starting session...")
     session = ale_bench.start(
         problem_id="ahc010",
-        lite_version=lite,
+        lite_version=False,
         num_workers=args.workers,
     )
     print("Session started. Running cases...\n")

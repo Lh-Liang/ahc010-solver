@@ -20,7 +20,7 @@ AHC010 - Loop Lines
   6: (0,2)  7: (1,3)
 
 输入格式：
-  N 行，每行 N 个字符（瓦片编号 0~7 拼接成字符串）
+  直接 N 行，每行 N 个字符（瓦片编号 0~7 拼接成字符串），不含 N 本身
 
 输出格式：
   一行长度 N*N 的字符串，第 30*i+j 个字符为格 (i,j) 的旋转次数 r_{i,j}
@@ -57,11 +57,10 @@ def get_connections(tile_type, rot):
 
 
 def solve():
-    N = int(input())
-    grid = []
-    for _ in range(N):
-        row = list(map(int, list(input().strip())))
-        grid.append(row)
+    # ale_bench 传入的输入不含 N 行，直接是 N 行瓦片数据
+    lines = [line.strip() for line in sys.stdin.read().splitlines() if line.strip()]
+    N = len(lines)
+    grid = [list(map(int, list(line))) for line in lines]
 
     # 并查集：每格 4 个端口，节点编号 = (row*N + col)*4 + dir
     total = N * N * 4

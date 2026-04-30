@@ -15,12 +15,11 @@ ALGO ARTIS Programming Contest 2022（AtCoder Heuristic Contest 010）「Loop Li
 ## 输入格式
 
 ```
-N
 [N 行，每行 N 个字符，各字符为瓦片编号 0~7]
 ```
 
 - N=30（固定）
-- 最后一行为 N（即 `4675` 对应 N=30... 实际为 N 单独一行后跟 N 行瓦片数据）
+- **注意**：ale_bench 传入的输入不包含 N 本身，第一行直接是瓦片数据
 
 ## 输出格式
 
@@ -81,7 +80,7 @@ python3 eval.py
 ### Windows（PowerShell 调用 WSL）
 
 ```powershell
-wsl -e bash -lc "source ~/ale-bench-env/bin/activate && cd /path/to/ahc010-solver && python3 eval.py"
+wsl -e bash -lc "source ~/ale-bench-env/bin/activate && cd /mnt/path/to/ahc010-solver && python3 eval.py"
 ```
 
 ## 解法说明
